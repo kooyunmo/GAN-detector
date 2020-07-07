@@ -15,4 +15,20 @@ GAN-dectector
 ```
 
 ## Overview
-This is manipulated image detection models which can be globally applied to multiple GAN images. 
+This is manipulated image detection models which can be globally applied to multiple GAN images.
+
+## How To Use
+### Prerequisite
+```
+pip install -r requirements.txt
+```
+
+### Train
+```
+TODO: Fill this
+```
+
+### Test
+```
+TODO: Fill this
+```
