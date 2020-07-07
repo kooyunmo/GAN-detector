@@ -15,3 +15,4 @@ GAN-dectector
 ```
 
 ## Overview
+This is manipulated image detection models which can be globally applied to multiple GAN images. 
