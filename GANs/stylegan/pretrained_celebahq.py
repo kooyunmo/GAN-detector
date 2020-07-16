@@ -14,15 +14,35 @@ import pickle
 import numpy as np
 import PIL.Image
 import dnnlib.tflib as tflib
-import config
 import sys
+import argparse
+import random
+
+from pydrive.drive import GoogleDrive
+from pydrive.auth import GoogleAuth
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--num-imgs', type=int, help='The number of images you want to generate')
+    parser.add_argument('--result-dir', type=str, help='Directory path to save generated imgs')
+    parser.add_argument('--gpu-num', type=int, help='gpu device number')
+    return parser.parse_args()
 
 def main():
+    args = parse_args()
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_num)
+
+    # Command line authentication to your Google Drive
+    # gauth = GoogleAuth()
+    # gauth.LocalWebserverAuth()
+    # drive = GoogleDrive(gauth)
+
+
     # Initialize TensorFlow.
     tflib.init_tf()
 
     # Load pre-trained network.
-    os.chdir(os.path.dirname(sys.argv[0]))
     filename = "karras2019stylegan-celebahq-1024x1024.pkl"
     with open(filename, "rb") as f:
         _G, _D, Gs = pickle.load(f)
@@ -33,9 +53,9 @@ def main():
     # Print network details.
     Gs.print_layers()
 
-    image_num = 10
-    rnd = np.random.RandomState(5)
-    os.makedirs(config.result_dir, exist_ok=True) # C:/stylegan/result
+    image_num = args.num_imgs
+    rnd = np.random.RandomState(random.randint(1, 1000))
+    os.makedirs(args.result_dir, exist_ok=True) # C:/stylegan/result
     for i in range(image_num):
         # Pick latent vector.
         latents = rnd.randn(1, Gs.input_shape[1])
@@ -45,8 +65,13 @@ def main():
         images = Gs.run(latents, None, truncation_psi=0.7, randomize_noise=True, output_transform=fmt)
 
         # Save image.
-        png_filename = os.path.join(config.result_dir, str(i + 1) + ".png")
+        png_filename = os.path.join(args.result_dir, str(i + 1) + ".png")
         PIL.Image.fromarray(images[0], 'RGB').save(png_filename)
+
+        # f = drive.CreateFile({'title': i + ".png"})
+        # f.SetContentFile(i + ".png")
+        # f.Upload()
+        # f = None        # for preventing memory leak
 
 if __name__ == "__main__":
     main()
