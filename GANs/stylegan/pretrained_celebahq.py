@@ -18,14 +18,26 @@ import sys
 import argparse
 import random
 
+from pydrive.drive import GoogleDrive
+from pydrive.auth import GoogleAuth
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--num-imgs', type=int, help='The number of images you want to generate')
     parser.add_argument('--result-dir', type=str, help='Directory path to save generated imgs')
+    parser.add_argument('--gpu-num', type=int, help='gpu device number')
     return parser.parse_args()
 
 def main():
     args = parse_args()
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_num)
+
+    # Command line authentication to your Google Drive
+    # gauth = GoogleAuth()
+    # gauth.LocalWebserverAuth()
+    # drive = GoogleDrive(gauth)
+
 
     # Initialize TensorFlow.
     tflib.init_tf()
@@ -41,7 +53,7 @@ def main():
     # Print network details.
     Gs.print_layers()
 
-    image_num = 10
+    image_num = args.num_imgs
     rnd = np.random.RandomState(random.randint(1, 1000))
     os.makedirs(args.result_dir, exist_ok=True) # C:/stylegan/result
     for i in range(image_num):
@@ -55,6 +67,11 @@ def main():
         # Save image.
         png_filename = os.path.join(args.result_dir, str(i + 1) + ".png")
         PIL.Image.fromarray(images[0], 'RGB').save(png_filename)
+
+        # f = drive.CreateFile({'title': i + ".png"})
+        # f.SetContentFile(i + ".png")
+        # f.Upload()
+        # f = None        # for preventing memory leak
 
 if __name__ == "__main__":
     main()
