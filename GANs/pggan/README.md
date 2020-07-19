@@ -10,7 +10,7 @@
 ```
 numpy == 1.18.5
 scipy == 1.4.1
-tensorflow-gpu == 2.2.0
+tensorflow-gpu == 1.15.0
 moviepy == 0.2.3.5
 Pillow == 7.0.0
 lmdb == 0.98
