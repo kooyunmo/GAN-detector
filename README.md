@@ -20,7 +20,11 @@ This is manipulated image detection models which can be globally applied to mult
 ## How To Use
 ### Prerequisite
 ```
-pip install -r requirements.txt
+# install dependent python packages
+$ pip install -r requirements.txt
+
+# download pretrained checkpoint for Xception
+$ wget http://data.lip6.fr/cadene/pretrainedmodels/xception-b5690688.pth -P [path to GAN-detector/models/Xception]
 ```
 
 ### Train
