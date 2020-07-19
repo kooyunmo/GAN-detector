@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from Xception.xception import xception
 import torchvision
+from torchsummary import summary
 
 
 def return_pytorch_xception(pretrained=True):
@@ -134,6 +135,5 @@ if __name__ == '__main__':
     model, image_size, *_ = model_selection('xception', num_out_classes=2)
     print(model)
     model = model.cuda()
-    from torchsummary import summary
     input_s = (3, image_size, image_size)
     print(summary(model, input_s))
