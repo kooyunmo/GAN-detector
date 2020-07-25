@@ -31,6 +31,7 @@ The code was built and tested for:
 ```
 (your_virtual_env) $ python celebahq_generate_samples.py \
 --num_samples [NUM_SAMPLES, default=100] \
+--random_random_state \
 --random_state [RANDOM_STATE, default=33] \
 --output_path [OUTPUT_PATH, default="celebahq_samples"]
 ```
@@ -40,8 +41,9 @@ The code was built and tested for:
 #### Arguments
 
 * `num_samples`: Integer, Number of samples to be generated. You need to adjust the code if bigger than `99999`.
-* `random_state`: Integer, Random state (seed) for the script to run. If `-1`, an integer is randomly selected from 1 to 1000.
-* `output_path`: String, (Absolute / Relative) Path to directory for saving the files
+* `random_random_state`: (optional) Use this when you want to select random_state (seed) randomly between 1 and 1000.
+* `random_state`: Integer, Random state (seed) for the script to run. Meaningless if `random_random_state` is used.
+* `output_path`: String, (Absolute / Relative) Path to directory for saving the files.
 
 
 

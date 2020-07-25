@@ -26,6 +26,13 @@ def parse_arguments():
     )
 
     parser.add_argument(
+        "--random_random_state",
+        action="store_true",
+        default=False,
+        help="Use this when you want to select random_state (seed) randomly",
+    )
+    
+    parser.add_argument(
         "--random_state",
         action="store",
         type=int,
@@ -119,7 +126,7 @@ def main(args):
     # Pick latent vector.
     latent_size = Gs.input_shape[1]
 
-    if args.random_state == -1:
+    if args.random_random_state:
         rnd = np.random.RandomState(random.randint(1, 1000))
     else:
         rnd = np.random.RandomState(args.random_state)
