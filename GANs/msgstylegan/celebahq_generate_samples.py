@@ -1,0 +1,155 @@
+""" Demo script for running Random-latent space interpolation on the trained MSG-StyleGAN OR
+    Show the effect of stochastic noise on a fixed image """
+
+import argparse
+import os
+import pickle
+import random
+from math import sqrt
+from pathlib import Path
+
+import dnnlib.tflib as tflib
+import imageio
+import numpy as np
+from tqdm import tqdm
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser("MSG-StyleGAN image_generator")
+
+    parser.add_argument(
+        "--output_path",
+        action="store",
+        type=str,
+        default="celebahq_samples",
+        help="Path to directory for saving the files",
+    )
+
+    parser.add_argument(
+        "--random_state",
+        action="store",
+        type=int,
+        default=33,
+        help="random_state (seed) for the script to run",
+    )
+
+    parser.add_argument(
+        "--out_depth",
+        action="store",
+        type=int,
+        default=None,
+        help="output depth of the generated images",
+    )
+
+    parser.add_argument(
+        "--truncation_psi",
+        action="store",
+        type=float,
+        default=0.6,
+        help="value of truncation psi used for generating the images",
+    )
+
+    parser.add_argument(
+        "--num_samples",
+        action="store",
+        type=int,
+        default=100,
+        help="Number of samples to be generated",
+    )
+
+    parser.add_argument(
+        "--only_noise",
+        action="store",
+        type=bool,
+        default=False,
+        help="to visualize the same point with only different realizations of noise",
+    )
+
+    parser.add_argument(
+        "--run_stylegan",
+        action="store",
+        type=bool,
+        default=False,
+        help="Whether you are running an MSG-StyleGAN model or just styleGAN",
+    )
+
+    args = parser.parse_args()
+    return args
+
+
+def get_image(gen, point, out_depth, truncation_psi=0.6, run_stylegan=False):
+    """
+    obtain an All-resolution grid of images from the given point
+    :param gen: the generator object
+    :param point: random latent point for generation
+    :param out_depth: depth of network from where the images are to be generated
+    :param truncation_psi: value of truncation psi used for generating the images
+    :param run_stylegan: whether to use a stylegan pkl for generating the images?
+    :return: img => generated image
+    """
+    fmt = dict(func=tflib.convert_images_to_uint8, nchw_to_nhwc=True)
+    point = np.expand_dims(point, axis=0)
+    images = gen.run(
+        point, None, truncation_psi=truncation_psi, randomize_noise=True, output_transform=fmt
+    )
+    if not run_stylegan:
+        if out_depth is None or out_depth >= len(images):
+            out_depth = -1
+        return np.squeeze(images[out_depth])
+    else:
+        return np.squeeze(images)
+
+
+def main(args):
+    # Initialize TensorFlow.
+    tflib.init_tf()
+
+    # Load pre-trained network.
+    filename = "celebahq_6.37.pkl"
+    with open(filename, "rb") as f:
+        _, _, Gs = pickle.load(f)
+        # _  = Instantaneous snapshot of the generator. Mainly useful for resuming a previous training run.
+        # _  = Instantaneous snapshot of the discriminator. Mainly useful for resuming a previous training run.
+        # Gs = Long-term average of the generator. Yields higher-quality results than the instantaneous snapshot.
+
+    # Print network details.
+    print("\n\nLoaded the Generator as:")
+    Gs.print_layers()
+
+    # Pick latent vector.
+    latent_size = Gs.input_shape[1]
+
+    if args.random_state == -1:
+        rnd = np.random.RandomState(random.randint(1, 1000))
+    else:
+        rnd = np.random.RandomState(args.random_state)
+
+    # create the random latent_points for the interpolation
+    total_samples = args.num_samples
+    all_latents = rnd.randn(total_samples, latent_size)
+    all_latents = (
+        all_latents / np.linalg.norm(all_latents, axis=-1, keepdims=True)
+    ) * sqrt(latent_size)
+
+    # animation mechanism
+    start_point = np.expand_dims(all_latents[0], axis=0)
+    points = all_latents
+
+    # all points are start_point, if we have only noise realization
+    if args.only_noise:
+        points = np.array([np.squeeze(start_point) for _ in points])
+
+    # make sure that the output path exists
+    output_path = Path(args.output_path)
+    output_path.mkdir(exist_ok=True)
+
+    print("Generating the requested number of samples ... ")
+    for count, point in tqdm(enumerate(points, 1)):
+        image = get_image(Gs, point, args.out_depth, args.truncation_psi)
+        imageio.imwrite(os.path.join(output_path, str(count).zfill(5) + ".png"), image)
+
+    print(f"Requested images have been generated at: {output_path}")
+
+
+if __name__ == "__main__":
+    main(parse_arguments())
