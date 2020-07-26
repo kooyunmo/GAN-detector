@@ -16,11 +16,12 @@ from torchsummary import summary
 from models.models import model_selection
 from utils.args import parse_args
 from utils.preprocess import preprocess
+from utils.plot import visualize
 
 torch.backends.cudnn.benchmark = True
 
 
-def train(epochs, model, train_loader, valid_loader, criterion, optimizer):
+def train(epochs, model, train_loader, valid_loader, criterion, optimizer, result_dir):
     valid_loss_min = np.Inf
     train_vis = []
     valid_vis = []
@@ -75,6 +76,8 @@ def train(epochs, model, train_loader, valid_loader, criterion, optimizer):
             time_info = str(now.tm_hour) + str(now.tm_min) + str(now.tm_sec)
             torch.save(model.state_dict(), 'xception_gan-detector' + time_info + '.pt')
             valid_loss_min = valid_loss
+        
+        visualize(train_vis, valid_vis, epoch, result_dir)
 
 
 if __name__ == '__main__':
@@ -98,4 +101,4 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(params=list(model.parameters())[:-1])
 
-    train(args.epochs, model, train_loader, valid_loader, criterion, optimizer)
+    train(args.epochs, model, train_loader, valid_loader, criterion, optimizer, args.result_dir)
