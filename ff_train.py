@@ -24,7 +24,7 @@ import torch.utils.data as data
 from PIL import Image as pil_image
 from tqdm import tqdm
 
-from utils.args import argparse
+from utils.args import parse_args
 from models.models import model_selection
 from dataset.voc0712 import FaceDetection,detection_collate
 from dataset.data_augment import preproc
