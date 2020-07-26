@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
     train_loader, valid_loader, test_loader = preprocess(trainset_path=args.data_dir + "/train",
                                                          testset_path=args.data_dir + "/test",
-                                                         classes=['stylegan', 'msgstylegan', 'vgan', 'real'],
+                                                         classes=['stylegan', 'pggan', 'msgstylegan', 'vgan', 'real'],
                                                          num_workers=40,
                                                          batch_size=args.batch_size,
                                                          validation_ratio=0.3)

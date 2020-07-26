@@ -4,14 +4,28 @@ Fake image detection model that can also classify which GAN was used to generate
 ## Directory Structure
 ```
 GAN-dectector
-    ├ models
-    |    ├--- Xception
-    |    └--- ResNet
-    └ utils
-         ├ args.py (argument parsing) 
-         ├ preprocessing.py
-         ├ train.py
-         └ test.py
+    ├- datasets
+    |    ├- train
+    |    |     ├- msgstylegan
+    |    |     ├- pggan
+    |    |     ├- stylegan
+    |    |     ├- vgan 
+    |    |     └- real
+    |    └- test 
+    |          ├- msgstylegan
+    |          ├- pggan
+    |          ├- stylegan
+    |          ├- vgan 
+    |          └- real 
+    ├- models
+    |    ├- models.py
+    |    ├- Xception
+    |    └- ResNet
+    ├- utils
+    |     ├- args.py (argument parsing) 
+    |     └- preprocessing.py
+    ├- train.py
+    └- test.py
 ```
 
 ## Overview
