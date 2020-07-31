@@ -21,6 +21,16 @@ six == 1.12.0
 ```
 
 - Make fake images using pre-trained PGGAN on CelebA-HQ (1024*1024)
-  * Process
-  * 1. Download pre-trained and place in same directory as the script : [`karras2018iclr-celebahq-1024x1024.pkl`](https://drive.google.com/open?id=188K19ucknC6wg1R6jbuPEhTq9zoufOx4)
-  * 2. Run : `Implementation.ipynb`
+## Process
+1. Download pre-trained and place in same directory as the script : [`karras2018iclr-celebahq-1024x1024.pkl`](https://drive.google.com/open?id=188K19ucknC6wg1R6jbuPEhTq9zoufOx4)
+2. With Google Colab run the scripts in `Implementation.ipynb`.
+3. With command line prompt, run the following script.
+
+```
+$ python generate_samples.py \
+    --result-dir [DIRECTORY TO SAVE RESULT IMAGES] \
+    --num-gen-imgs [NUMBER OF IMAGES TO GENERATE] \
+    --gpu [GPU PCI ID]
+```
+
+
