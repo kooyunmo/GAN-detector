@@ -17,8 +17,6 @@ def parse_args():
                         help='output directory to save generated images')
     parser.add_argument('--num-gen-imgs', type=int, default=10,
                         help='the number of images to generate')
-    parser.add_argument('--batch-size', type=int, default=10,
-                        help='inference batch size')
     parser.add_argument('--gpu', type=str, default='0',
                         help='gpu id')
     return parser.parse_args()
@@ -47,17 +45,6 @@ def main():
         images = images.transpose(0, 2, 3, 1)
         png_filename = os.path.join(args.result_dir, str(idx).zfill(5) + ".png")
         PIL.Image.fromarray(images[0], 'RGB').save(png_filename)
-
-    '''
-    # Convert images to PIL-compatible format.
-    images = np.clip(np.rint((images + 1.0) / 2.0 * 255.0), 0.0, 255.0).astype(np.uint8) # [-1,1] => [0,255]
-    images = images.transpose(0, 2, 3, 1) # NCHW => NHWC
-
-    # Save images as PNG.
-    for idx in range(images.shape[0]):
-        png_filename = os.path.join(args.result_dir, str(idx).zfill(5) + ".png")
-        PIL.Image.fromarray(images[idx], 'RGB').save(png_filename)
-    '''
 
 if __name__ == '__main__':
     main()
