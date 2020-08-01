@@ -112,4 +112,4 @@ print('Creating samples...')
 for i in range(sample_size):
     ztest = zdist.sample((1,))
     x = evaluator.create_samples(ztest)
-    utils.save_images(x, path.join(img_dir, '%08d.png' % i))
+    utils.save_images(x, path.join(img_dir, '%05d.png' % i))
