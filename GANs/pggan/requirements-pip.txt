@@ -1,0 +1,10 @@
+tensorflow-gpu==1.15.2
+numpy
+scipy
+moviepy
+Pillow
+lmdb
+opencv-python
+cryptography
+h5py
+six

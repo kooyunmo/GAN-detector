@@ -65,8 +65,7 @@ def main():
         images = Gs.run(latents, None, truncation_psi=0.7, randomize_noise=True, output_transform=fmt)
 
         # Save image.
-        zero_len = len(str(args.num_imgs)) - len(str(i))
-        png_filename = os.path.join(args.result_dir, '0'*zero_len + str(i) + ".png")
+        png_filename = os.path.join(args.result_dir, str(i).zfill(5) + ".png")
         PIL.Image.fromarray(images[0], 'RGB').save(png_filename)
 
         # f = drive.CreateFile({'title': i + ".png"})
