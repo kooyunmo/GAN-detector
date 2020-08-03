@@ -7,19 +7,25 @@ import argparse
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 import torchvision
 from torchvision import datasets, models, transforms
+import pandas as pd
 import matplotlib.pyplot as plt
+from PIL import Image
 from tqdm import tqdm
+import cv2
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--phase', type=str, default='train', help='model phase: choose between `train` and `test`.')
     parser.add_argument('--data-dir', type=str, default='./datasets', help='root of data directory')
+    parser.add_argument('--model-path', type=str, help='model checkpoint path')
     parser.add_argument('--num-epochs', type=int, default=30, help='the number of epochs')
     parser.add_argument('--batch-size', type=int, default=1, help='training batch size')
     parser.add_argument('--save-dir', type=str, default='./checkpoints', help='directory to save model checkpoints')
@@ -95,6 +101,10 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=
 
     model.load_state_dict(best_model_wts)
     return model
+
+
+def test_model(model, dataloaders):
+    raise NotImplementedError
 
 
 def visualize_model(model, dataloaders, classes, num_images=10):
@@ -174,23 +184,33 @@ def main():
     test_loader = DataLoader(test_dataset, batch_size=20, num_workers=num_workers, shuffle=True)
     dataloaders = {'train': train_loader, 'val': valid_loader, 'test': test_loader}
     print("Classes: ", train_dataset.classes)
+    print("==== Dataset Size ====")
+    print("Training set: ", len(train_dataset))
+    print("Test set: ", len(test_dataset))
+    print()
 
     # inputs, classes = next(iter(valid_loader))
     # out = torchvision.utils.make_grid(inputs)
     # imsave(inputs, 'example_image.png')
 
-    model = models.resnet101(pretrained=True)
-    num_filters = model.fc.in_features
-    model.fc = nn.Linear(num_filters, len(train_dataset.classes))
+    if args.model_path is not None:
+        print("Load model from '{}'".format(args.model_path))
+        model = torch.load(args.model_path)
+    else:
+        model = models.resnet101(pretrained=True)
+        num_filters = model.fc.in_features
+        model.fc = nn.Linear(num_filters, len(train_dataset.classes))
     model = model.cuda()
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
-    model = train_model(model, dataloaders, criterion, optimizer, exp_lr_scheduler, args.num_epochs)
-
-    torch.save(model, os.path.join(args.save_dir, 'gan-detection-resnet101.h5'))
+    if args.phase == 'train':
+        model = train_model(model, dataloaders, criterion, optimizer, exp_lr_scheduler, args.num_epochs)
+        torch.save(model, os.path.join(args.save_dir, 'gan-detection-resnet101.h5'))
+    else:
+        test_model(model, dataloaders)
 
 
 if __name__ == '__main__':
