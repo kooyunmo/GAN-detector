@@ -130,3 +130,7 @@ dmypy.json
 
 # vscode
 .vscode/
+
+# datasets
+datasets/
+checkpoints/
