@@ -3,7 +3,7 @@ python main.py \
     --data-dir ./datasets \
     --model-name xception \
     --model-path ./checkpoints/gan-detection-xception.h5 \
-    --num-epochs 3 \
+    --num-epochs 500 \
     --batch-size 16 \
     --save-dir ./checkpoints \
     --gpu 1
