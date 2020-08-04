@@ -21,17 +21,17 @@ def visualize(model_name, train_loss, valid_loss, train_acc, valid_acc, epochs):
     plt.grid()
 
     plt.plot(epochs, train_loss)
-    plt.scatter(epochs, train_loss, label='train loss')
+    plt.scatter(epochs, train_loss, c='blue', label='train loss')
     plt.plot(epochs, valid_loss)
-    plt.scatter(epochs, valid_loss, label='valid loss')
+    plt.scatter(epochs, valid_loss, c='cornflowerblue', label='valid loss')
     plt.plot(epochs, train_acc)
-    plt.scatter(epochs, train_acc, label='train acc')
+    plt.scatter(epochs, train_acc, c='red', label='train acc')
     plt.plot(epochs, valid_acc)
-    plt.scatter(epochs, valid_acc, label='valid acc')
+    plt.scatter(epochs, valid_acc, c='coral', label='valid acc')
 
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = OrderedDict(zip(labels, handles))
-    lgnd = plt.legend(by_label.values(), by_label.keys(), loc='upper right')
+    lgnd = plt.legend(by_label.values(), by_label.keys(), loc='upper left')
     for handle in lgnd.legendHandles:
         handle.set_sizes([50])
     

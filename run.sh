@@ -4,6 +4,6 @@ python main.py \
     --model-name xception \
     --model-path ./checkpoints/gan-detection-xception.h5 \
     --num-epochs 500 \
-    --batch-size 16 \
+    --batch-size 32 \
     --save-dir ./checkpoints \
     --gpu 1

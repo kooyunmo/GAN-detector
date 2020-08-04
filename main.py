@@ -155,7 +155,7 @@ def main():
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     print("Configuration: ", args)
 
-    dataloaders = preprocess(args.model_name, args.data_dir, 4, 32, 0.2)
+    dataloaders = preprocess(args.model_name, args.data_dir, 4, args.batch_size, 0.2)
 
     # inputs, classes = next(iter(dataloaders['val']))
     # out = torchvision.utils.make_grid(inputs)
