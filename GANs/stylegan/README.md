@@ -26,5 +26,9 @@
 2. Changing the parameter in "rnd = np.random.RandomState()" may provide different results.
 3. Run the following script
 ```
-$ python pretrained_celebahq.py --num-imgs [NUM_IMAGES] --result-dir [RESULT_DIR]
+python pretrained_celebahq.py \
+    --img-num-start [START_IMG_NUM] \
+    --num-imgs [NUM_IMAGES] \
+    --result-dir [RESULT_DIR] \
+    --gpu-num [GPU_ID]
 ```
