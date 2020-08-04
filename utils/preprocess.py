@@ -6,7 +6,7 @@ from torchvision import datasets
 import torchvision.transforms as transforms
 
 
-def preprocess(trainset_path, testset_path, classes=None, num_workers=4, batch_size=32, validation_ratio=0.2):
+def preprocess(trainset_path, testset_path, num_workers=4, batch_size=32, validation_ratio=0.2):
     transform = transforms.Compose([
         transforms.RandomHorizontalFlip(),
         transforms.Resize([299, 299]),
@@ -30,6 +30,10 @@ def preprocess(trainset_path, testset_path, classes=None, num_workers=4, batch_s
                               num_workers=num_workers)
     test_loader = DataLoader(test_dataset, batch_size=20, num_workers=num_workers, shuffle=True)
 
-    print("Classes: ", classes)
+    print("Classes: ", train_dataset.classes)
+    print("==== Dataset Size ====")
+    print("Training set: ", len(train_dataset))
+    print("Test set: ", len(test_dataset))
+    print()
 
     return train_loader, valid_loader, test_loader
