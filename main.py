@@ -14,17 +14,23 @@ from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 import torchvision
 from torchvision import datasets, models, transforms
+from torchsummary import summary
 import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
 from tqdm import tqdm
 import cv2
 
+from models.models import model_selection
+from utils.preprocess import preprocess
+from utils.plot import visualize
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--phase', type=str, default='train', help='model phase: choose between `train` and `test`.')
     parser.add_argument('--data-dir', type=str, default='./datasets', help='root of data directory')
+    parser.add_argument('--model-name', type=str, default='xception', help='model name (e.g. xception, resnet101, etc)')
     parser.add_argument('--model-path', type=str, help='model checkpoint path')
     parser.add_argument('--num-epochs', type=int, default=30, help='the number of epochs')
     parser.add_argument('--batch-size', type=int, default=1, help='training batch size')
@@ -42,8 +48,9 @@ def imsave(inp, filename):
     plt.imsave(filename, inp)
 
 
-def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=30):
+def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler, num_epochs=30):
     start = time.time()
+    train_loss_log, valid_loss_log, train_acc_log, valid_acc_log, epoch_log = list(), list(), list(), list(), list()
 
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
@@ -91,7 +98,15 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
-        
+            
+            if phase == 'train':
+                train_loss_log.append(epoch_loss)
+                train_acc_log.append(epoch_acc.item())
+            else:
+                valid_loss_log.append(epoch_loss)
+                valid_acc_log.append(epoch_acc.item())
+        epoch_log.append(epoch)
+        visualize(model_name, train_loss_log, valid_loss_log, train_acc_log, valid_acc_log, epoch_log)
         print()
     
     elapsed_time = time.time() - start
@@ -138,58 +153,11 @@ def main():
     torch.backends.cudnn.benchmark = True
     args = parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-    print(args)
+    print("Configuration: ", args)
 
-    data_transforms = {
-        'train': transforms.Compose([
-            transforms.Resize(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5,), (0.5, 0.5, 0.5))
-        ]),
-        'val': transforms.Compose([
-            transforms.Resize(224),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5 ,0.5))
-        ]),
-        'test': transforms.Compose([
-            transforms.Resize(224),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        ]),
-    }
+    dataloaders = preprocess(args.model_name, args.data_dir, 4, 32, 0.2)
 
-    data_dir = args.data_dir
-    batch_size = args.batch_size
-    validation_ratio = 0.2
-    num_workers = 4
-
-    train_dataset = datasets.ImageFolder(os.path.join(data_dir, 'train'),
-                                          transform=data_transforms['train'])
-    test_dataset = datasets.ImageFolder(os.path.join(data_dir, 'test'),
-                                         transform=data_transforms['test'])
-    num_trainset = len(train_dataset)
-    indices = list(range(num_trainset))
-    np.random.shuffle(indices)
-    split = int(np.floor(validation_ratio * num_trainset))
-    train_idx, valid_idx = indices[split:], indices[:split]
-
-    train_sampler = SubsetRandomSampler(train_idx)
-    valid_sampler = SubsetRandomSampler(valid_idx)    
-
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler,
-                              num_workers=num_workers)
-    valid_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=valid_sampler,
-                              num_workers=num_workers)
-    test_loader = DataLoader(test_dataset, batch_size=20, num_workers=num_workers, shuffle=True)
-    dataloaders = {'train': train_loader, 'val': valid_loader, 'test': test_loader}
-    print("Classes: ", train_dataset.classes)
-    print("==== Dataset Size ====")
-    print("Training set: ", len(train_dataset))
-    print("Test set: ", len(test_dataset))
-    print()
-
-    # inputs, classes = next(iter(valid_loader))
+    # inputs, classes = next(iter(dataloaders['val']))
     # out = torchvision.utils.make_grid(inputs)
     # imsave(inputs, 'example_image.png')
 
@@ -197,18 +165,24 @@ def main():
         print("Load model from '{}'".format(args.model_path))
         model = torch.load(args.model_path)
     else:
-        model = models.resnet101(pretrained=True)
-        num_filters = model.fc.in_features
-        model.fc = nn.Linear(num_filters, len(train_dataset.classes))
+        model, *_ = model_selection(args.model_name, len(dataloaders['train'].dataset.classes))
     model = model.cuda()
+    hw_size = 224 if 'resnet' in args.model_name else 299
+    print(summary(model, (3, hw_size, hw_size)))
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
     if args.phase == 'train':
-        model = train_model(model, dataloaders, criterion, optimizer, exp_lr_scheduler, args.num_epochs)
-        torch.save(model, os.path.join(args.save_dir, 'gan-detection-resnet101.h5'))
+        model = train_model(model=model,
+                            model_name=args.model_name,
+                            dataloaders=dataloaders,
+                            criterion=criterion,
+                            optimizer=optimizer,
+                            scheduler=exp_lr_scheduler,
+                            num_epochs=args.num_epochs)
+        torch.save(model, os.path.join(args.save_dir, 'gan-detection-' + args.model_name + '.h5'))
     else:
         test_model(model, dataloaders)
 

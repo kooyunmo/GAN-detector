@@ -29,12 +29,7 @@ class TransferModel(nn.Module):
     Simple transfer learning model that takes an imagenet pretrained model with
     a fc layer as base model and retrains a new fc layer for num_out_classes
     """
-    def __init__(self, modelchoice, num_out_classes=2, dropout=0.0):
-        """
-        TODO: `num_out_classes` is currently set to 2 to classify whether the input
-        images are real or fake. If you want to figure out which GAN is used to generate
-        the images, `num_out_classes` should be 1(real) + 1(unknown) + (num of known GANs).
-        """
+    def __init__(self, modelchoice, num_out_classes, dropout=0.0):
         super(TransferModel, self).__init__()
         self.modelchoice = modelchoice
         if modelchoice == 'xception':
@@ -50,11 +45,13 @@ class TransferModel(nn.Module):
                     nn.Dropout(p=dropout),
                     nn.Linear(num_filters, num_out_classes)
                 )
-        elif modelchoice == 'resnet50' or modelchoice == 'resnet18':
+        elif modelchoice == 'resnet101' or modelchoice == 'resnet50' or modelchoice == 'resnet18':
             if modelchoice == 'resnet50':
                 self.model = torchvision.models.resnet50(pretrained=True)
             if modelchoice == 'resnet18':
                 self.model = torchvision.models.resnet18(pretrained=True)
+            if modelchoice == 'resnet101':
+                self.model = torchvision.models.resnet101(pretrained=True)
 
             # replace fc
             num_filters = self.model.fc.in_features
@@ -123,8 +120,8 @@ def model_selection(modelname, num_out_classes,
         return TransferModel(modelchoice='xception',
                              num_out_classes=num_out_classes), 299, \
                True, ['image'], None
-    elif modelname == 'resnet18':
-        return TransferModel(modelchoice='resnet18', dropout=dropout,
+    elif modelname == 'resnet18' or modelname == 'resnet50' or modelname == 'resnet101':
+        return TransferModel(modelchoice=modelname, dropout=dropout,
                              num_out_classes=num_out_classes), \
                224, True, ['image'], None
     else:

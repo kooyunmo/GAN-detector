@@ -3,9 +3,13 @@ import time
 import matplotlib.pyplot as plt
 
 
-def visualize(train_vis, valid_vis, epoch_vis, save_dir):
-    plt.plot(epoch_vis, train_vis)
-    plt.scatter(epoch_vis, train_vis)
-    plt.plot(epoch_vis, valid_vis)
-    plt.scatter(epoch_vis, valid_vis)
-    plt.savefig(os.path.join(save_dir, 'xception_loss.png'))
+def visualize(model_name, train_loss, valid_loss, train_acc, valid_acc, epochs):
+    plt.plot(epochs, train_loss)
+    plt.scatter(epochs, train_loss)
+    plt.plot(epochs, valid_loss)
+    plt.scatter(epochs, valid_loss)
+    plt.plot(epochs, train_acc)
+    plt.scatter(epochs, train_acc)
+    plt.plot(epochs, valid_acc)
+    plt.scatter(epochs, valid_acc)
+    plt.savefig(model_name + '_training_log.png')
