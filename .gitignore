@@ -134,3 +134,4 @@ dmypy.json
 # datasets
 datasets/
 checkpoints/
+*.pth
