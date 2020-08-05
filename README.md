@@ -4,28 +4,40 @@ Fake image detection model that can also classify which GAN was used to generate
 ## Directory Structure
 ```
 GAN-dectector
-    ├- datasets
-    |    ├- train
-    |    |     ├- msgstylegan
-    |    |     ├- pggan
-    |    |     ├- stylegan
-    |    |     ├- vgan 
-    |    |     └- real
-    |    └- test 
-    |          ├- msgstylegan
-    |          ├- pggan
-    |          ├- stylegan
-    |          ├- vgan 
-    |          └- real 
-    ├- models
-    |    ├- models.py
-    |    ├- Xception
-    |    └- ResNet
-    ├- utils
-    |     ├- args.py (argument parsing) 
-    |     └- preprocessing.py
-    ├- train.py
-    └- test.py
+├── checkpoints
+│   ├── gan-detection-resnet101.h5
+│   └── gan-detection-xception.h5
+├── datasets
+│   ├── test
+│   │   ├── msgstylegan
+│   │   ├── pggan
+│   │   ├── stylegan
+│   │   └── vgan
+│   └── train
+│       ├── msgstylegan
+│       ├── pggan
+│       ├── stylegan
+│       └── vgan
+├── GANs
+│   ├── msgstylegan
+│   ├── pggan
+│   ├── stylegan
+│   └── vgan
+├── main.py
+├── models
+│   ├── models.py
+│   └── Xception
+│       ├── xception-b5690688.pth
+│       └── xception.py
+├── notebooks
+│   └── ResNet_Fake_Face.ipynb
+├── README.md
+├── requirements.txt
+├── run.sh
+├── test.py
+└── utils
+    ├── plot.py
+    └── preprocess.py
 ```
 
 ## Overview
@@ -43,7 +55,19 @@ $ wget http://data.lip6.fr/cadene/pretrainedmodels/xception-b5690688.pth -P [pat
 
 ### Train
 ```
-TODO: Fill this
+// run with a shell script
+$ sh run.sh
+
+// manually run
+$ python main.py \
+      --phase train \
+      --data-dir ./datasets \
+      --model-name {resnet101, xception, ...} \
+      --model-path ./checkpoints/gan-detection-{resnet101, xception, ...}.h5 \
+      --num-epochs {the number of training epochs} \
+      --batch-size {batch size} \
+      --save-dir ./checkpoints \
+      --gpu {GPU PCI ID}
 ```
 
 ### Test
