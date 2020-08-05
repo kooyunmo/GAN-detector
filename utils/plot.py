@@ -13,20 +13,22 @@ def visualize(model_name, train_loss, valid_loss, train_acc, valid_acc, epochs):
     mp.rcParams['ytick.labelsize'] = font_size+1
     mp.rcParams['axes.labelsize'] = font_size+5
     mp.rcParams['legend.fontsize'] = font_size
-    mp.rcParams['legend.frameon'] = False
+    mp.rcParams['legend.frameon'] = True
+    mp.rcParams['legend.framealpha'] = 0.5
+    mp.rcParams['legend.facecolor'] = 'silver'
 
     plt.title(model_name + ': training log', fontsize=15)
     plt.xlabel('Epoch', fontsize=12)
     plt.ylabel('Loss or Acc (%)', fontsize=12)
     plt.grid()
 
-    plt.plot(epochs, train_loss)
+    plt.plot(epochs, train_loss, color='blue')
     plt.scatter(epochs, train_loss, c='blue', label='train loss')
-    plt.plot(epochs, valid_loss)
+    plt.plot(epochs, valid_loss, color='cornflowerblue')
     plt.scatter(epochs, valid_loss, c='cornflowerblue', label='valid loss')
-    plt.plot(epochs, train_acc)
+    plt.plot(epochs, train_acc, color='red')
     plt.scatter(epochs, train_acc, c='red', label='train acc')
-    plt.plot(epochs, valid_acc)
+    plt.plot(epochs, valid_acc, color='coral')
     plt.scatter(epochs, valid_acc, c='coral', label='valid acc')
 
     handles, labels = plt.gca().get_legend_handles_labels()
