@@ -113,9 +113,9 @@ def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler,
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
 
-                #print("preds: ", preds)
-                #print("labels: ", labels.data)
-                #print()
+                print("preds: ", preds)
+                print("labels: ", labels.data)
+                print()
             
             if phase == 'train':
                 scheduler.step()
@@ -129,7 +129,9 @@ def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler,
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
-            
+                print("Saving checkpoint...")
+                torch.save(model, os.path.join(save_dir, 'gan-detection-' + model_name + '.h5'))
+                print("Done.\n")
             if phase == 'train':
                 train_loss_log.append(epoch_loss)
                 train_acc_log.append(epoch_acc.item())
@@ -139,8 +141,6 @@ def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler,
         epoch_log.append(epoch)
         visualize(model_name, train_loss_log, valid_loss_log, train_acc_log, valid_acc_log, epoch_log)
         #visualize_results(model, dataloaders, dataloaders['val'].dataset.classes)
-        torch.save(model, os.path.join(save_dir, 'gan-detection-' + model_name + '.h5'))
-        print()
     
     elapsed_time = time.time() - start
     print("Training complete in {:.0f}m {:.0f}s".format(
