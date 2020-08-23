@@ -135,3 +135,6 @@ dmypy.json
 datasets/
 checkpoints/
 *.pth
+
+# .ipynb
+notebooks/
