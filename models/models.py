@@ -55,7 +55,7 @@ class TransferModel(nn.Module):
 
             # replace fc
             num_filters = self.model.fc.in_features
-            if not dropout:
+            if dropout == 0:
                 self.model.fc = nn.Linear(num_filters, num_out_classes)
             else:
                 print("Using dropout (dropout rate: ", dropout, ")")
@@ -111,7 +111,7 @@ class TransferModel(nn.Module):
         return x
 
 def model_selection(modelname, num_out_classes,
-                    dropout=None):
+                    dropout=0.0):
     """
     :param modelname:
     :return: model, image size, pretraining<yes/no>, input_list
