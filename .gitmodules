@@ -1,0 +1,3 @@
+[submodule "reference/celeba-hq-modified"]
+	path = reference/celeba-hq-modified
+	url = https://github.com/willylulu/celeba-hq-modified.git
