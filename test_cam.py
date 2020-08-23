@@ -109,7 +109,7 @@ model_names = sorted(
     for name in models.__dict__
     if name.islower() and not name.startswith("__") and callable(models.__dict__[name])
 )
-
+model_names.append('xception')
 
 @click.group()
 @click.pass_context
@@ -140,6 +140,7 @@ def demo1(image_paths, target_layer, arch, topk, output_dir, cuda):
     model = get_model(arch)
     model.to(device)
     model.eval()
+    print(model)
 
     # Images
     images, raw_images = load_images(image_paths)
