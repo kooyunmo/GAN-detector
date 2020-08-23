@@ -55,7 +55,7 @@ training:
     target_kl: 0.1
 test:
   batch_size: 1
-  sample_size: 1000
+  sample_size: 10000
   sample_nrow: 1
   use_model_average: true
   compute_inception: false

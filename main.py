@@ -40,15 +40,43 @@ def parse_args():
 
 
 def imsave(inp, filename):
-    inp = inp[0].numpy().transpose((1, 2, 0))
+    inp = inp.numpy().transpose((1, 2, 0))
     mean = np.array([0.5, 0.5, 0.5])
     std = np.array([0.5, 0.5, 0.5])
     inp = std * inp + mean
     inp = np.clip(inp, 0, 1)
+    plt.title('Prediction Examples')
     plt.imsave(filename, inp)
 
 
-def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler, num_epochs=30):
+def visualize_results(model, dataloaders, classes, num_images=10):
+    was_training = model.training
+    model.eval()
+    images_so_far = 0
+    fig = plt.figure()
+
+    with torch.no_grad():
+        for i, (inputs, labels) in enumerate(dataloaders['val']):
+            inputs = inputs.cuda()
+            labels = labels.cuda()
+
+            outputs = model(inputs)
+            _, preds = torch.max(outputs, 1)
+
+            for j in range(inputs.size()[0]):
+                images_so_far += 1
+                ax = plt.subplot(num_images//2, 2, images_so_far)
+                ax.axis('off')
+                ax.set_title('predicted: {}'.format(classes[preds[j]]))
+                imsave(inputs.cpu().data[j], 'pred_examples.png')
+
+                if images_so_far == num_images:
+                    model.train(mode=was_training)
+                    return
+        model.train(mode=was_training)
+
+
+def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler, batch_size, save_dir, num_epochs=30):
     start = time.time()
     train_loss_log, valid_loss_log, train_acc_log, valid_acc_log, epoch_log = list(), list(), list(), list(), list()
 
@@ -78,19 +106,22 @@ def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler,
                     outputs = model(inputs)
                     _, preds = torch.max(outputs, 1)    # return predicted class indices
                     loss = criterion(outputs, labels)
-                    
                     if phase == 'train':
                         loss.backward()
                         optimizer.step()
 
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
+
+                #print("preds: ", preds)
+                #print("labels: ", labels.data)
+                #print()
             
             if phase == 'train':
                 scheduler.step()
 
-            epoch_loss = running_loss / len(dataloaders[phase])
-            epoch_acc = running_corrects.double() / len(dataloaders[phase])
+            epoch_loss = running_loss / (len(dataloaders[phase]) * batch_size)
+            epoch_acc = running_corrects.double() / (len(dataloaders[phase]) * batch_size)
 
             print("{} Loss: {:.4f}\t Acc: {:.4f}".format(
                 phase, epoch_loss, epoch_acc))
@@ -107,6 +138,8 @@ def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler,
                 valid_acc_log.append(epoch_acc.item())
         epoch_log.append(epoch)
         visualize(model_name, train_loss_log, valid_loss_log, train_acc_log, valid_acc_log, epoch_log)
+        #visualize_results(model, dataloaders, dataloaders['val'].dataset.classes)
+        torch.save(model, os.path.join(save_dir, 'gan-detection-' + model_name + '.h5'))
         print()
     
     elapsed_time = time.time() - start
@@ -120,33 +153,6 @@ def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler,
 
 def test_model(model, dataloaders):
     raise NotImplementedError
-
-
-def visualize_model(model, dataloaders, classes, num_images=10):
-    was_training = model.training
-    model.eval()
-    images_so_far = 0
-    fig = plt.figure()
-
-    with torch.no_grad():
-        for i, (inputs, labels) in enumerate(dataloaders['val']):
-            inputs = inputs.cuda()
-            labels = labels.cuda()
-
-            outputs = model(inputs)
-            _, preds = torch.max(outputs, 1)
-
-            for j in range(inputs.size()[0]):
-                images_so_far += 1
-                ax = plt.subplot(num_images//2, 2, images_so_far)
-                ax.axis('off')
-                ax.set_title('predicted: {}'.format(classes[preds[j]]))
-                imsave('pred_examples.png', inputs.cpu().data[j])
-
-                if images_so_far == num_images:
-                    model.train(mode=was_training)
-                    return
-        model.train(mode=was_training)
 
 
 def main():
@@ -181,6 +187,8 @@ def main():
                             criterion=criterion,
                             optimizer=optimizer,
                             scheduler=exp_lr_scheduler,
+                            batch_size=args.batch_size,
+                            save_dir=args.save_dir,
                             num_epochs=args.num_epochs)
         torch.save(model, os.path.join(args.save_dir, 'gan-detection-' + args.model_name + '.h5'))
     else:

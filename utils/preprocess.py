@@ -6,7 +6,7 @@ from torchvision import datasets
 import torchvision.transforms as transforms
 
 
-def preprocess(model_name, data_dir, num_workers=4, batch_size=32, validation_ratio=0.2):
+def preprocess(model_name, data_dir, num_workers=4, batch_size=32, validation_ratio=0.1):
     transform_size = 224 if 'resnet' in model_name else 299
 
     data_transforms = {
@@ -38,7 +38,7 @@ def preprocess(model_name, data_dir, num_workers=4, batch_size=32, validation_ra
     train_idx, valid_idx = indices[split:], indices[:split]
 
     train_sampler = SubsetRandomSampler(train_idx)
-    valid_sampler = SubsetRandomSampler(valid_idx)    
+    valid_sampler = SubsetRandomSampler(valid_idx)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler,
                               num_workers=num_workers)
