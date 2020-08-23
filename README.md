@@ -56,7 +56,7 @@ $ wget http://data.lip6.fr/cadene/pretrainedmodels/xception-b5690688.pth -P [pat
 ### Train
 ```
 // run with a shell script
-$ sh run.sh
+$ sh train.sh
 
 // manually run
 $ python main.py \
@@ -73,4 +73,13 @@ $ python main.py \
 ### Test
 ```
 TODO: Fill this
+```
+
+### Result Analysis with Grad-CAM
+```
+// run with a shell script
+$ sh grad_cam.sh
+
+// manually run
+$ python test_cam.py demo1 -a {model name} -t {layer name} -i {image path}
 ```
