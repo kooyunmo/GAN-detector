@@ -1,1 +1,7 @@
-python test_cam.py demo1 -a resnet101 -t model.layer4 -i datasets/test/msgstylegan/00800.png
+# resnet: model.layer4
+# xception: model.conv4
+
+python test_cam.py demo1 \
+    -a xception \
+    -t model.conv4 \
+    -i datasets/train/msgstylegan/09899.png

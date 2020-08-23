@@ -10,6 +10,7 @@ import os.path as osp
 
 import click
 import cv2
+from PIL import Image
 import matplotlib.cm as cm
 import numpy as np
 import torch
@@ -39,13 +40,13 @@ def get_device(cuda):
     return device
 
 
-def load_images(image_paths):
+def load_images(image_paths, arch):
     images = []
     raw_images = []
     print("Images:")
     for i, image_path in enumerate(image_paths):
         print("\t#{}: {}".format(i, image_path))
-        image, raw_image = preprocess(image_path)
+        image, raw_image = preprocess(image_path, arch)
         images.append(image)
         raw_images.append(raw_image)
     return images, raw_images
@@ -56,13 +57,15 @@ def get_classtable():
     return classes
 
 
-def preprocess(image_path):
+
+def preprocess(image_path, arch):
+    transform_size = 224 if 'resnet' in arch else 299
     raw_image = cv2.imread(image_path)
-    raw_image = cv2.resize(raw_image, (224,) * 2)
+    raw_image = cv2.resize(raw_image, (transform_size,) * 2)
     image = transforms.Compose(
         [
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
         ]
     )(raw_image[..., ::-1].copy())
     return image, raw_image
@@ -143,7 +146,7 @@ def demo1(image_paths, target_layer, arch, topk, output_dir, cuda):
     print(model)
 
     # Images
-    images, raw_images = load_images(image_paths)
+    images, raw_images = load_images(image_paths, arch)
     images = torch.stack(images).to(device)
 
     """
