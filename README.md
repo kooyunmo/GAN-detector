@@ -86,10 +86,25 @@ TODO: Fill this
 ```
 
 ### Result Analysis with Grad-CAM
+**1) Grad-CAM visualization for a target layer**
 ```
 // run with a shell script
 $ sh grad_cam.sh
 
 // manually run
-$ python test_cam.py demo1 -a {model name} -t {layer name} -i {image path}
+$ python test_cam.py demo1 \
+      -a {model name}
+      -t {layer name}
+      -i {image path}
+```
+
+**2) Grad-CAM map for a specific class at different layers**
+```
+// run with a shell script
+$ sh layer_grad_cam.sh
+
+$ python test_cam.py demo2 \
+      -a xception \
+      -i datasets/test/pggan/00876.png \
+      -c pggan
 ```
