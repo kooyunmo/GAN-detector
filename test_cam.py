@@ -263,10 +263,11 @@ def demo1(image_paths, target_layer, arch, topk, output_dir, cuda):
 @click.option("-i", "--image-paths", type=str, multiple=True, required=True)
 @click.option("-a", "--arch", type=click.Choice(model_names), required=True)
 @click.option("-o", "--output-dir", type=str, default="./cam_results/demo2")
+@click.option("-c", "--trgt_class", type=str, default=None)
 @click.option("--cuda/--cpu", default=True)
-def demo2(image_paths, arch, output_dir, cuda):
+def demo2(image_paths, arch, trgt_class, output_dir, cuda):
     """
-    Generate Grad-CAM at different layers of ResNet-152
+    Generate Grad-CAM at different layers
     """
 
     device = get_device(cuda)
@@ -291,7 +292,10 @@ def demo2(image_paths, arch, output_dir, cuda):
     else:
         raise NotImplementedError
 
-    target_class = classes.index(image_paths[0].split('/')[2])
+    if trgt_class is None:
+        target_class = classes.index(image_paths[0].split('/')[2])
+    else:
+        target_class = classes.index(trgt_class)
 
     # Images
     images, raw_images = load_images(image_paths, arch)
