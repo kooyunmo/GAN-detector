@@ -4,8 +4,12 @@ Fake image detection model that can also classify which GAN was used to generate
 ## Directory Structure
 ```
 GAN-dectector
+├── cam_results
+│   ├── demo1
+│   └── demo2
 ├── checkpoints
 │   ├── gan-detection-resnet101.h5
+│   ├── gan-detection-resnet50.h5
 │   └── gan-detection-xception.h5
 ├── datasets
 │   ├── test
@@ -23,21 +27,27 @@ GAN-dectector
 │   ├── pggan
 │   ├── stylegan
 │   └── vgan
+├── grad_cam.sh
+├── layer_grad_cam.sh
 ├── main.py
 ├── models
 │   ├── models.py
 │   └── Xception
+│       ├── __init__.py
 │       ├── xception-b5690688.pth
 │       └── xception.py
-├── notebooks
-│   └── ResNet_Fake_Face.ipynb
 ├── README.md
 ├── requirements.txt
-├── run.sh
+├── resnet101_training_log.png
+├── resnet50_training_log.png
+├── test_cam.py
 ├── test.py
-└── utils
-    ├── plot.py
-    └── preprocess.py
+├── train.sh
+├── utils
+│   ├── grad_cam.py
+│   ├── plot.py
+│   └── preprocess.py
+└── xception_training_log.png
 ```
 
 ## Overview
