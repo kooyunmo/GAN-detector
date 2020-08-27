@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-# original repo: https://github.com/kazuto1011/grad-cam-pytorch
+# Modified from original repo: https://github.com/kazuto1011/grad-cam-pytorch
 
 
 from __future__ import print_function
@@ -125,7 +125,7 @@ def main(ctx):
 @click.option("-a", "--arch", type=click.Choice(model_names), required=True)
 @click.option("-t", "--target-layer", type=str, required=True)
 @click.option("-k", "--topk", type=int, default=4)
-@click.option("-o", "--output-dir", type=str, default="./cam_results")
+@click.option("-o", "--output-dir", type=str, default="./cam_results/demo1")
 @click.option("--cuda/--cpu", default=True)
 def demo1(image_paths, target_layer, arch, topk, output_dir, cuda):
     """
@@ -261,9 +261,10 @@ def demo1(image_paths, target_layer, arch, topk, output_dir, cuda):
 
 @main.command()
 @click.option("-i", "--image-paths", type=str, multiple=True, required=True)
-@click.option("-o", "--output-dir", type=str, default="./cam_results")
+@click.option("-a", "--arch", type=click.Choice(model_names), required=True)
+@click.option("-o", "--output-dir", type=str, default="./cam_results/demo2")
 @click.option("--cuda/--cpu", default=True)
-def demo2(image_paths, output_dir, cuda):
+def demo2(image_paths, arch, output_dir, cuda):
     """
     Generate Grad-CAM at different layers of ResNet-152
     """
@@ -272,18 +273,28 @@ def demo2(image_paths, output_dir, cuda):
 
     # Synset words
     classes = get_classtable()
+    print("classes: ", classes)
 
     # Model
-    model = models.resnet152(pretrained=True)
+    print("Grad-cam with ", arch)
+    model = get_model(arch)
     model.to(device)
     model.eval()
 
     # The four residual layers
-    target_layers = ["relu", "layer1", "layer2", "layer3", "layer4"]
-    target_class = 243  # "bull mastif"
+    if arch == 'xception':
+        target_layers = ['model.block1', 'model.block2', 'model.block3', 'model.block4',
+                         'model.block5', 'model.block6', 'model.block7', 'model.block8',
+                         'model.block9', 'model.block10', 'model.block11', 'model.block12']
+    elif arch == 'resnet101' or arch == 'resnet50':
+        target_layers = ["model.relu", "model.layer1", "model.layer2", "model.layer3", "model.layer4"]
+    else:
+        raise NotImplementedError
+
+    target_class = classes.index(image_paths[0].split('/')[2])
 
     # Images
-    images, raw_images = load_images(image_paths)
+    images, raw_images = load_images(image_paths, arch)
     images = torch.stack(images).to(device)
 
     gcam = GradCAM(model=model)
@@ -307,8 +318,8 @@ def demo2(image_paths, output_dir, cuda):
             save_gradcam(
                 filename=osp.join(
                     output_dir,
-                    "{}-{}-gradcam-{}-{}.png".format(
-                        j, "resnet152", target_layer, classes[target_class]
+                    "{}-gradcam-{}-{}.png".format(
+                        arch, target_layer, classes[target_class]
                     ),
                 ),
                 gcam=regions[j, 0],

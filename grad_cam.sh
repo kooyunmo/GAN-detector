@@ -3,5 +3,5 @@
 
 python test_cam.py demo1 \
     -a xception \
-    -t model.conv4 \
-    -i datasets/train/msgstylegan/09899.png
+    -t model.block12 \
+    -i datasets/test/pggan/00876.png
