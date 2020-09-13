@@ -15,7 +15,7 @@ GAN 연구에서 흔히 사용되는 CelebA-HQ(1024 x 1024)와 FFHQ(1024 x 1024)
 
 ## Binary Classification
 
-<p align="center"><img src="resnet50_binary_training_log.png" width="500" alt="correct chart"></img></p>
+<p align="center"><img src="resnet50_binary_training_log.png" width="500" alt="binary resnet50 chart"></img></p>
 
 'real'과 'fake'를 판별하는 첫 번째 실험에서는 ImageNet으로 사전 학습된 ResNet-50를 baseline network로 사용하였다. Linear classifier 부분만 binary classification을 하도록 수정하여 fine-tuning한 결과 위의 그림과 같이 99%의 정확도를 보였다. 즉, ImageNet으로 사전 학습된 네트워크를 manipulation detection task에 효과적으로 활용하는 것이 가능하며, image classification에서 얻을 수 있는 정확도 보다 높은 정확도를 얻을 수 있다. 사람에게는 사진 속의 대상이 개인지 고양이인지 알아 맞추는 것이 정교한 가짜 이미지를 보고 진위를 판별해내는 것보다 훨씬 쉬운 일이지만 딥러닝에서는 진짜, 가짜를 판별하는 것이 훨씬 쉬운 일이라고 할 수 있다.
 
@@ -23,8 +23,8 @@ GAN 연구에서 흔히 사용되는 CelebA-HQ(1024 x 1024)와 FFHQ(1024 x 1024)
 
 앞에서 'real'과 'fake'를 판별하는 것은 쉽게 해결될 수 있음을 확인하였다. 그렇다면 task의 난이도를 높여서 주어진 합성 이미지가 어떤 GAN을 통해 만들어진 것인지 판별하는 것도 가능할까? Binary classification에서와 마찬가지로 baseline network의 classifier를 4개의 class(MSG-GAN, StyleGAN, PGGAN, VGAN)에 대한 logit을 계산하도록 바꾼 뒤 ImageNet에서 사전 학습된 weight를 적용하여 fine-tuning을 하였다. 이번에는 ResNet-50 뿐 아니라 ResNet-101, Xception도 baseline network로 추가하여 실험을 진행하였다.
 
-<p align="center"><img src="resnet101_training_log.png" width="500" alt="correct chart"></img></p>
-<p align="center"><img src="xception_training_log.png" width="500" alt="correct chart"></img></p>
+<p align="center"><img src="resnet101_training_log.png" width="500" alt="multi resnet101 chart"></img></p>
+<p align="center"><img src="xception_training_log.png" width="500" alt="multi xception chart"></img></p>
 
 실험 결과 ResNet과 Xception 모두 binary classification에서와 마찬가지로 99%의 정확도에 도달할 수 있었다. 'real', 'fake'를 판별하는 것 뿐아니라 주어진 이미지가 MSG-GAN, StyleGAN, PGGAN, VGAN 중 어떤 모델에서 생성된 것인지 구분하는 것 역시 완벽에 가깝게 해낼 수 있다. 'real', 'fake'를 판별하는 것은 사람의 눈으로도 어느 정도는 구분이 가능하지만 가짜 이미지가 어떤 모델에서 생성된 것인지 판별하는 것은 사람에게는 거의 불가능한 일이다.
 
@@ -32,19 +32,19 @@ GAN 연구에서 흔히 사용되는 CelebA-HQ(1024 x 1024)와 FFHQ(1024 x 1024)
 
 **1) MSG-GAN**
 
-<p align="center"><img src="images/msgstylegan/1.png" width="500" alt="correct chart"></img></p>
+<p align="center"><img src="images/msgstylegan/msgstylegan.png" width="800" alt="msgstylegan"></img></p>
 
 **2) StyleGAN**
 
-<p align="center"><img src="images/stylegan/1.png" width="500" alt="correct chart"></img></p>
+<p align="center"><img src="images/stylegan/stylegan.png" width="800" alt="stylegan"></img></p>
 
 **3) PGGAN**
 
-<p align="center"><img src="images/pggan/5.png" width="500" alt="correct chart"></img></p>
+<p align="center"><img src="images/pggan/pggan.png" width="800" alt="pggan"></img></p>
 
 **4) VGAN**
 
-<p align="center"><img src="images/vgan/1.png" width="500" alt="correct chart"></img></p>
+<p align="center"><img src="images/vgan/vgan.png" width="800" alt="vgan"></img></p>
 
 # Reference
 [1] F. Marra, D. Gragnaniello, L. Verdoliva, and G. Poggi, “Do GANs Leave Artificial Fingerprints?” in Proc. IEEE Conference on Multime- dia Information Processing and Retrieval, 2019, pp. 506–511.
