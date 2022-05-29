@@ -54,6 +54,7 @@ GAN-dectector
 This is manipulated image detection models which can be globally applied to multiple GAN images.
 
 ## How To Use
+
 ### Prerequisite
 ```
 # install dependent python packages
@@ -108,3 +109,21 @@ $ python test_cam.py demo2 \
       -i datasets/test/pggan/00876.png \
       -c pggan
 ```
+
+## Example Results
+
+**1) MSG-GAN**
+
+<p align="center"><img src="images/msgstylegan/msgstylegan.png" width="800" alt="msgstylegan"></img></p>
+
+**2) StyleGAN**
+
+<p align="center"><img src="images/stylegan/stylegan.png" width="800" alt="stylegan"></img></p>
+
+**3) PGGAN**
+
+<p align="center"><img src="images/pggan/pggan.png" width="800" alt="pggan"></img></p>
+
+**4) VGAN**
+
+<p align="center"><img src="images/vgan/vgan.png" width="800" alt="vgan"></img></p>
